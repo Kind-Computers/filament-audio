@@ -843,7 +843,7 @@ void CResampler::InitializeTablesFromScratch(bool force)
 		// β tapers with tap count (fewer taps = wider transition band).
 		struct MipParam { double cutoff; double beta; };
 
-		// Aniso-64 mip chain (64-tap, 8192 phases)
+		// Aniso-64 mip chain (64-tap, 65536 phases)
 		{
 			static const MipParam aniso64[MIP_LEVELS] = {
 				{ 0.995, 14.0 },   // Level 0: upsampling / near-unity
