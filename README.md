@@ -17,7 +17,7 @@ A/B the result live during playback.
 - Opens modules directly from archives (`.zip`, `.7z`, `.rar`, `.tar.*`, `.lha`, `.cab`, `.iso`)
 - Replaces samples live during playback so you can compare Original, Reference 48k,
   and AI remasters (AudioSR, LavaSR, FLowHigh, AP-BWE) without restarting the song
-- Exports the live result to FLAC or AAC (512 kbps)
+- Exports the live result to FLAC or AAC (256 kbps)
 - Supports batch CLI rendering for directories of modules
 - Installs as a Linux desktop app (`--install-icon`)
 
@@ -47,7 +47,7 @@ in the coefficient path.
 Each sample in the module can be upscaled to 48 kHz via three methods:
 
 - **AI** (AudioSR / LavaSR / FLowHigh / AP-BWE): neural bandwidth extension
-- **48k reference**: deterministic sinc resampling (rubato)
+- **48k reference**: deterministic sinc resampling (FFmpeg swresample)
 - **Original**: raw sample at native rate (typically 8–22 kHz)
 
 Samples are replaced live during playback. Pattern offset effects (`Oxx`, `SAx`)
@@ -61,7 +61,7 @@ Pitch bends (vibrato, portamento, slides) are tracked in full `double` precision
 (`PitchT = double`, `FreqT = double`) — no fixed-point period tables or integer
 slide accumulators. IT linear slides use `pow(2.0, amount/768.0)` directly.
 
-The resampling filter is a 64-tap polyphase sinc with 8192 phases (13-bit phase
+The resampling filter is a 64-tap polyphase sinc with 65536 phases (16-bit phase
 resolution) and an octave-spaced mipmap chain. Each mipmap level tunes Kaiser
 window beta independently (β = 14.0 at unity down to β = 8.0 at 128× downsample)
 with anisotropic velocity shear coefficients (k_β = 0.65, k_β² = 0.15) that
