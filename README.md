@@ -113,9 +113,10 @@ accumulator loops — runtime dispatch picks the widest available path.
 ## Listen
 
 A/B ten tracker modules straight from the repo. The **before** column is the
-deterministic 96 kHz render (original samples, no AI); the **after** column is
-the same module with samples upscaled by the AI engines. Both are 96 kHz AAC
-at 256 kbps. Click to play.
+deterministic render (original samples, no AI); the **after** column is the
+same module with samples upscaled by the AI engines. Both clips are 48 kHz
+AAC at 256 kbps — downsampled from the engine's 96 kHz default so HTML5
+audio in Chrome/Firefox can play them inline. Click to play.
 
 | Module | Format | Before | After |
 | --- | --- | --- | --- |
