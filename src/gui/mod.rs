@@ -1208,7 +1208,10 @@ fn engine_checkbox_tooltip(name: &str, enabled: bool) -> String {
 }
 
 fn install_missing_button_tooltip(names: &[&str]) -> String {
-    format!("Show install commands for {}.", names.join(", "))
+    format!(
+        "Show install instructions for {}.",
+        names.join(", ")
+    )
 }
 
 fn blind_test_play_tooltip(label: &str) -> String {
@@ -1660,8 +1663,10 @@ pub struct Filament {
     pending_post_cancel_action: Option<RemasterInterruptAction>,
     restore_originals_after_cancel: bool,
     show_install_dialog: bool,
-    /// (title, commands) for the install dialog — None means use default AudioSR content.
-    install_dialog_content: Option<(String, String)>,
+    /// Custom title for the install dialog (e.g. "Install Missing Engines (...)"
+    /// when only some engines are missing). None means the default "no engines
+    /// installed" title.
+    install_dialog_title: Option<String>,
     audio_error: Option<String>,
     show_audio_error_dialog: bool,
 
@@ -1798,7 +1803,7 @@ impl Filament {
                 pending_post_cancel_action: None,
                 restore_originals_after_cancel: false,
                 show_install_dialog: matches!(status, RemasterStatus::Unavailable),
-                install_dialog_content: None,
+                install_dialog_title: None,
                 show_audio_error_dialog: audio_error.is_some(),
                 audio_error,
                 interpolation: InterpolationChoice::Aniso64,
@@ -2698,14 +2703,13 @@ impl Filament {
                 self.remaster_interrupt_action = None;
             }
             Message::ShowInstallDialog => {
-                self.install_dialog_content = None; // default Filament engine install content
+                self.install_dialog_title = None;
                 self.show_install_dialog = true;
             }
             Message::ShowInstallMissing => {
-                if let Some((names, cmds)) = self.remaster_engine.missing_engine_install_commands()
-                {
-                    let title = format!("Install Missing Engines ({})", names.join(", "));
-                    self.install_dialog_content = Some((title, cmds));
+                if let Some(names) = self.remaster_engine.missing_engine_names() {
+                    self.install_dialog_title =
+                        Some(format!("Install Missing Engines ({})", names.join(", ")));
                     self.show_install_dialog = true;
                 }
             }
@@ -2723,15 +2727,12 @@ impl Filament {
             }
             Message::DismissInstallDialog => {
                 self.show_install_dialog = false;
-                self.install_dialog_content = None;
+                self.install_dialog_title = None;
             }
             Message::CopyInstallCommand => {
-                let cmds = if let Some((_, ref c)) = self.install_dialog_content {
-                    c.clone()
-                } else {
-                    crate::remaster::install_commands()
-                };
-                return iced::clipboard::write(cmds);
+                return iced::clipboard::write(
+                    crate::remaster::INSTALL_COMMAND.to_string(),
+                );
             }
             Message::CopyRemasterError => {
                 if let RemasterStatus::Failed(e) = &self.remaster_status {
@@ -4451,7 +4452,7 @@ impl Filament {
                 ));
             }
         }
-        if let Some((names, _)) = self.remaster_engine.missing_engine_install_commands() {
+        if let Some(names) = self.remaster_engine.missing_engine_names() {
             engine_checks.push(widgets::with_tooltip(
                 button(text(format!("Install {}", names.join(", "))).size(10))
                     .on_press(Message::ShowInstallMissing)
@@ -4799,35 +4800,20 @@ impl Filament {
             format!("Current smoke check: {}", detected.join(", "))
         };
 
-        let (title, install_cmds, subtitle) = if let Some((ref t, ref c)) =
-            self.install_dialog_content
-        {
-            (
-                t.clone(),
-                c.clone(),
-                format!(
-                    "{}\nRun these pinned commands in a terminal to install the missing Filament engines.",
-                    crate::remaster::supported_install_matrix()
-                ),
-            )
-        } else {
-            (
-                "No Filament Engines Installed".to_string(),
-                crate::remaster::install_commands(),
-                format!(
-                    "{}\nFilament can use AudioSR, LavaSR, and FLowHigh.\nRun these pinned commands in a terminal to install the supported engines.",
-                    crate::remaster::supported_install_matrix()
-                ),
-            )
-        };
+        let title = self
+            .install_dialog_title
+            .clone()
+            .unwrap_or_else(|| "No Filament Engines Installed".to_string());
 
         let dialog = container(
             column![
                 text(title).size(20).color(theme::ACCENT_AMBER),
-                text(subtitle).size(13).color(theme::CONTENT_TEXT),
+                text(crate::remaster::install_instructions())
+                    .size(13)
+                    .color(theme::CONTENT_TEXT),
                 container(
-                    text(install_cmds.clone())
-                        .size(13)
+                    text(crate::remaster::INSTALL_COMMAND)
+                        .size(14)
                         .color(theme::ACCENT_GREEN)
                 )
                 .width(Length::Fill)
@@ -4842,13 +4828,13 @@ impl Filament {
                     ..Default::default()
                 }),
                 widgets::with_tooltip(
-                    button(text("Copy to Clipboard").size(12))
+                    button(text("Copy Command").size(12))
                         .on_press(Message::CopyInstallCommand)
                         .padding([6, 16]),
-                    "Copy the install commands to the clipboard.",
+                    "Copy the installer command to the clipboard.",
                 ),
                 text(smoke_status).size(11).color(theme::PANEL_LABEL),
-                text("Run the final smoke-check command, then restart Filament to refresh engine detection.")
+                text("Restart Filament after the installer finishes to refresh engine detection.")
                     .size(11)
                     .color(theme::PANEL_LABEL),
                 widgets::with_tooltip(

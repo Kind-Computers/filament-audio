@@ -98,19 +98,15 @@ pub enum UpscaleMode {
     GpuOnly,
 }
 
-const SUPPORTED_INSTALL_MATRIX: &str = "Supported Linux matrix: x86_64-unknown-linux-gnu, Python 3.12+ venv, torch 2.11.x, torchaudio 2.11.x, torchvision 0.26.x.";
-const PINNED_AUDIOSR_SPEC: &str = "audiosr==0.0.7";
-const PINNED_AUDIO_DEPS: &str = "numpy==2.4.3 librosa==0.11.0 soundfile==0.13.1 scipy==1.17.1 transformers==5.3.0 \
-einops==0.8.2 PyYAML==6.0.3 tqdm==4.67.3 chardet==7.3.0 huggingface_hub==1.8.0 \
-torchlibrosa==0.1.0 timm==1.0.26 progressbar2==4.5.0 ftfy==6.3.1 Unidecode==1.4.0 \
-phonemizer==3.3.0 pandas==3.0.1 matplotlib==3.10.8 torchcodec==0.11.0";
-const PINNED_VOCOS_SPEC: &str = "vocos @ git+https://github.com/langtech-bsc/vocos.git@451e522f7a11c3652c9522f63ea6780736d93de0";
-const PINNED_LAVASR_SPEC: &str = "LavaSR @ git+https://github.com/ysharma3501/LavaSR.git@2bad8f7e505e7cd590b0e21bf24c6a0b362bdfac";
-const PINNED_FLOWHIGH_SPEC: &str = "flowhigh @ git+https://github.com/resemble-ai/flowhigh.git@8b5abcf7f0bc82aaef0e8936f0f5b9ab61990dd2";
-const PINNED_APBWE_REPO: &str = "https://github.com/yxlu-0102/AP-BWE.git";
-const PINNED_APBWE_COMMIT: &str = "751710f22404c27e5bcc983248f8b856a04b8422";
-const APBWE_CHECKPOINTS_FOLDER_URL: &str =
-    "https://drive.google.com/drive/folders/1IIYTf2zbJWzelu4IftKD6ooHloJ8mnZF";
+/// One-line shell command users paste to install all engines. The installer
+/// script handles apt deps, GPU-specific torch wheels, venv setup, every AI
+/// engine, and weight downloads in one shot.
+pub const INSTALL_COMMAND: &str = "./install_prerequisites.sh";
+
+/// URL to the installer script in the upstream repo, for users who installed
+/// from a binary release and don't have the source checked out.
+pub const INSTALL_SCRIPT_URL: &str =
+    "https://raw.githubusercontent.com/Kind-Computers/filament-audio/main/install_prerequisites.sh";
 
 #[derive(Debug, Clone)]
 pub enum RemasterStatus {
@@ -224,132 +220,33 @@ impl RemasterEngine {
         self.engines.iter().map(|e| e.name()).collect()
     }
 
-    /// Install commands for engines that are NOT currently detected.
-    /// Returns None if all 3 engines are installed.
-    pub fn missing_engine_install_commands(&self) -> Option<(Vec<&'static str>, String)> {
+    /// Names of engines that are NOT currently detected. Returns None when
+    /// every supported engine is installed.
+    pub fn missing_engine_names(&self) -> Option<Vec<&'static str>> {
         let detected: Vec<&str> = self.engines.iter().map(|e| e.name()).collect();
-        let v = engine::venv_dir();
-        let vd = v.display().to_string();
-
-        let mut missing_names = Vec::new();
-        let mut lines = Vec::new();
-
-        if !detected.iter().any(|n| n.eq_ignore_ascii_case("audiosr")) {
-            missing_names.push("AudioSR");
-            lines.extend(audiosr_install_lines(&vd));
+        let mut missing = Vec::new();
+        for name in ["AudioSR", "LavaSR", "FLowHigh", "AP-BWE"] {
+            if !detected.iter().any(|n| n.eq_ignore_ascii_case(name)) {
+                missing.push(name);
+            }
         }
-        if !detected.iter().any(|n| n.eq_ignore_ascii_case("lavasr")) {
-            missing_names.push("LavaSR");
-            lines.push(format!("{vd}/bin/pip install \"{PINNED_LAVASR_SPEC}\""));
-        }
-        if !detected.iter().any(|n| n.eq_ignore_ascii_case("flowhigh")) {
-            missing_names.push("FLowHigh");
-            lines.push(format!("{vd}/bin/pip install \"{PINNED_FLOWHIGH_SPEC}\""));
-        }
-
-        if missing_names.is_empty() {
-            return None;
-        }
-
-        // Prepend venv creation + torch if the venv doesn't exist yet
-        let mut cmds = String::new();
-        if !v.join("bin").join("python3").exists() {
-            cmds.push_str(python3_version_guard());
-            cmds.push_str(&format!("python3 -m venv {vd}\n"));
-            cmds.push_str(&format!(
-                "{vd}/bin/pip install --upgrade pip setuptools==70.2.0\n"
-            ));
-            cmds.push_str(&engine::torch_install_line());
-            cmds.push('\n');
-        }
-        cmds.push_str(&format!("# {SUPPORTED_INSTALL_MATRIX}\n"));
-        cmds.push_str(&lines.join("\n"));
-        cmds.push('\n');
-        cmds.push_str(&engine::install_smoke_check_line());
-
-        Some((missing_names, cmds))
+        if missing.is_empty() { None } else { Some(missing) }
     }
 }
 
-/// Install commands for all engines.
-pub fn install_commands() -> String {
-    let v = engine::venv_dir();
-    let vd = v.display().to_string();
-    let mut cmds = String::new();
-
-    // If torch is missing, the venv is either empty or fundamentally broken.
-    // Point users at the one-shot installer script before the wall of manual
-    // pip commands — it handles apt deps, venv creation, GPU-specific torch
-    // wheels, and all three engines in one go.
-    if !engine::venv_has_package("torch") {
-        cmds.push_str(&format!(
-            "# The venv at {vd} looks empty or broken (torch is not importable).\n"
-        ));
-        cmds.push_str(
-            "# Easiest fix: run install_prerequisites.sh from the Filament source repo.\n",
-        );
-        cmds.push_str(
-            "# It installs apt deps, creates the venv, and installs torch + all engines.\n",
-        );
-        cmds.push_str("#\n");
-        cmds.push_str("# Or install manually:\n");
-    }
-
-    cmds.push_str(&format!("# {SUPPORTED_INSTALL_MATRIX}\n"));
-    if !v.join("bin").join("python3").exists() {
-        cmds.push_str(python3_version_guard());
-        cmds.push_str(&format!("python3 -m venv {vd}\n"));
-    }
-    cmds.push_str(&format!(
-        "{vd}/bin/pip install --upgrade pip setuptools==70.2.0\n"
-    ));
-    cmds.push_str(&engine::torch_install_line());
-    cmds.push('\n');
-    cmds.push_str(&audiosr_install_lines(&vd).join("\n"));
-    cmds.push('\n');
-    cmds.push_str(&format!("{vd}/bin/pip install \"{PINNED_LAVASR_SPEC}\"\n"));
-    cmds.push_str(&format!(
-        "{vd}/bin/pip install \"{PINNED_FLOWHIGH_SPEC}\"\n"
-    ));
-    cmds.push_str(&apbwe_install_lines(&vd).join("\n"));
-    cmds.push('\n');
-    cmds.push_str(&engine::install_smoke_check_line());
-    cmds
-}
-
-pub fn supported_install_matrix() -> &'static str {
-    SUPPORTED_INSTALL_MATRIX
-}
-
-/// Shell guard that checks python3 exists and is >= 3.12.
-fn python3_version_guard() -> &'static str {
-    "command -v python3 >/dev/null 2>&1 || { echo 'Error: python3 not found. Install Python 3.12+.' >&2; exit 1; }\n\
-     python3 -c 'import sys; exit(0 if sys.version_info >= (3,12) else 1)' || { echo \"Error: $(python3 --version) is too old. Filament Audio requires Python 3.12+.\" >&2; exit 1; }\n"
-}
-
-fn audiosr_install_lines(vd: impl std::fmt::Display) -> Vec<String> {
-    vec![
-        format!("{vd}/bin/pip install {PINNED_AUDIOSR_SPEC} --no-deps"),
-        format!("{vd}/bin/pip install {PINNED_AUDIO_DEPS}"),
-        format!("{vd}/bin/pip install \"{PINNED_VOCOS_SPEC}\""),
-    ]
-}
-
-fn apbwe_install_lines(vd: impl std::fmt::Display) -> Vec<String> {
-    vec![
-        "# AP-BWE (speech bandwidth extension — cloned repo + Google Drive weights)".into(),
-        "APBWE_DIR=\"$HOME/.local/share/filament-audio/apbwe\"".into(),
-        format!("[ -d \"$APBWE_DIR/.git\" ] || git clone {PINNED_APBWE_REPO} \"$APBWE_DIR\""),
-        "git -C \"$APBWE_DIR\" fetch --quiet".into(),
-        format!("git -C \"$APBWE_DIR\" checkout --quiet {PINNED_APBWE_COMMIT}"),
-        format!("{vd}/bin/pip install --quiet gdown"),
-        "mkdir -p \"$APBWE_DIR/checkpoints\"".into(),
-        format!(
-            "(cd \"$APBWE_DIR/checkpoints\" && \"{vd}/bin/gdown\" --folder {APBWE_CHECKPOINTS_FOLDER_URL})"
-        ),
-        "find \"$APBWE_DIR/checkpoints\" -mindepth 2 -type f -name 'g_*to48k' -exec mv -n {} \"$APBWE_DIR/checkpoints/\" \\;".into(),
-        "ls \"$APBWE_DIR/checkpoints\"/g_*to48k >/dev/null 2>&1 || { echo \"AP-BWE: gdown produced no checkpoints — Google Drive may be throttling. Retry or download manually.\" >&2; exit 1; }".into(),
-    ]
+/// User-facing install instructions. The installer script is idempotent, so we
+/// point at it whether the venv is empty or only partially populated.
+pub fn install_instructions() -> String {
+    format!(
+        "Run {INSTALL_COMMAND} from the Filament source repo.\n\
+         \n\
+         It installs apt deps, the right torch wheel for your GPU\n\
+         (CUDA / ROCm / XPU / CPU), all four AI engines\n\
+         (AudioSR, LavaSR, FLowHigh, AP-BWE), and their weights.\n\
+         \n\
+         If you don't have the source, download the script from:\n\
+         {INSTALL_SCRIPT_URL}"
+    )
 }
 
 impl RemasterEngine {

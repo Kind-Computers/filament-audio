@@ -603,38 +603,6 @@ pub(crate) fn write_venv_script(name: &str, content: &str) -> Result<PathBuf, St
     Ok(path)
 }
 
-/// Generate PyTorch install line appropriate for the detected GPU.
-pub(crate) fn torch_install_line() -> String {
-    let v = venv_dir();
-    let vd = v.display();
-    let gpu = GPU_VENDOR.get_or_init(detect_gpu);
-    match gpu {
-        GpuVendor::Nvidia => {
-            format!("{vd}/bin/pip install torch==2.11.0 torchaudio==2.11.0 torchvision==0.26.0")
-        }
-        GpuVendor::Amd => format!(
-            "{vd}/bin/pip install torch==2.11.0 torchaudio==2.11.0 torchvision==0.26.0 \\\n  \
-             --index-url https://download.pytorch.org/whl/rocm7.2"
-        ),
-        GpuVendor::Intel => format!(
-            "{vd}/bin/pip install torch==2.11.0 torchaudio==2.11.0 torchvision==0.26.0 \\\n  \
-             --index-url https://download.pytorch.org/whl/xpu"
-        ),
-        GpuVendor::None => format!(
-            "{vd}/bin/pip install torch==2.11.0+cpu torchaudio==2.11.0+cpu torchvision==0.26.0+cpu \\\n  \
-             --index-url https://download.pytorch.org/whl/cpu"
-        ),
-    }
-}
-
-pub(crate) fn install_smoke_check_line() -> String {
-    let v = venv_dir();
-    let vd = v.display();
-    format!(
-        "{vd}/bin/python -c \"import importlib.util, os.path; ok=[m for m in ('audiosr','lavasr','flowhigh') if importlib.util.find_spec(m)]; ok += ['apbwe'] if os.path.isfile(os.path.expanduser('~/.local/share/filament-audio/apbwe/models/model.py')) else []; print('Filament Audio smoke check:', ', '.join(ok) if ok else 'no engines detected')\""
-    )
-}
-
 pub(crate) fn engine_preference_rank(name: &str) -> usize {
     if name.eq_ignore_ascii_case("lavasr") {
         0

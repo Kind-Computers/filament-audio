@@ -286,10 +286,10 @@ pub(crate) fn detect_remaster_engine(
             return Ok(engine);
         }
 
-        return Err(
-            "No AI remastering engines found. Install the Filament engines:\n\n".to_string()
-                + &remaster::install_commands(),
-        );
+        return Err(format!(
+            "No AI remastering engines found.\n\n{}",
+            remaster::install_instructions()
+        ));
     }
 
     let detected = RemasterEngine::detect();
@@ -332,10 +332,10 @@ fn remaster_module_in_place(
     cancel_flag: &std::sync::atomic::AtomicBool,
 ) -> Result<RemasterOutcome, String> {
     if !engine.is_available() {
-        return Err(
-            "No AI remastering engines found. Install the Filament engines:\n\n".to_string()
-                + &remaster::install_commands(),
-        );
+        return Err(format!(
+            "No AI remastering engines found.\n\n{}",
+            remaster::install_instructions()
+        ));
     }
 
     let work_dir = tempfile::tempdir().map_err(|e| e.to_string())?;
