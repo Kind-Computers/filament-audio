@@ -1,9 +1,5 @@
 # Filament Audio
 
-**Filament Audio — Presented by Kind Computers**
-
-Kind Computers makes beautiful, technically ambitious software.
-
 Filament Audio is a tracker music player and remastering tool for MOD/S3M/XM/IT and
 related formats. It plays modules, can remaster their source samples with
 optional external AI backends (AudioSR, LavaSR, FLowHigh, AP-BWE), and lets you
