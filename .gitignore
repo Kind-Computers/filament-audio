@@ -1,0 +1,36 @@
+/target
+*.o
+*.a
+*.d
+*.so
+*.dylib
+
+# AudioSR vendored source (large ML repo, installed separately)
+/versatile_audio_super_resolution-main/
+
+# Beta version of OpenMPT for local reference
+/openmpt-0.9.0-beta
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+
+# Debug logs
+*.log
+
+# LaTeX build artifacts
+*.aux
+*.out
+
+# Editor / OS
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+.DS_Store
+.claude/
+.codex
+
