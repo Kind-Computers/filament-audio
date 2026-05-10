@@ -131,6 +131,11 @@ audio in Chrome/Firefox can play them inline. Click to play.
 | tiny_tunes | MOD | [listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/rendered/tiny_tunes.m4a) | [listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/remastered/tiny_tunes-Filament-Audio-Remastered-96Khz.m4a) |
 | znm-wopeace | IT | [listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/rendered/znm-wopeace.m4a) | [listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/remastered/znm-wopeace-Filament-Audio-Remastered-96Khz.m4a) |
 
+Want the full 96 kHz originals? Download
+[filament-audio-96khz-bundle.zip](https://github.com/Kind-Computers/filament-audio/releases/download/audio-bundle-v1/filament-audio-96khz-bundle.zip)
+(275 MB — all 20 clips at 96 kHz AAC / 256 kbps, organized as
+`rendered/` and `remastered/`).
+
 ## Build
 
 Filament Audio currently targets Linux `x86_64-unknown-linux-gnu`. The build expects
