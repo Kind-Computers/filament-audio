@@ -120,21 +120,21 @@ accumulator loops — runtime dispatch picks the widest available path.
 A/B ten tracker modules straight from the repo. The **before** column is the
 deterministic render (original samples, no AI); the **after** column is the
 same module with samples upscaled by the AI engines. Both clips are 48 kHz
-AAC at 256 kbps — downsampled from the engine's 96 kHz default so HTML5
-audio in Chrome/Firefox can play them inline. Click to play.
+MP3 at 320 kbps — downsampled from the engine's 96 kHz default so HTML5
+audio plays them inline in every browser. Click to play.
 
 | Module | Format | Before | After |
 | --- | --- | --- | --- |
-| 2ND_PM | S3M | [listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/rendered/2ND_PM.m4a) | **[listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/remastered/2ND_PM-Filament-Audio-Remastered-96Khz.m4a)** |
-| 4mat_-_eternity | XM | [listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/rendered/4mat_-_eternity.m4a) | **[listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/remastered/4mat_-_eternity-Filament-Audio-Remastered-96Khz.m4a)** |
-| beyond_the_network | IT | [listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/rendered/beyond_the_network.m4a) | **[listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/remastered/beyond_the_network-Filament-Audio-Remastered-96Khz.m4a)** |
-| Caroline | XM | [listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/rendered/Caroline.m4a) | **[listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/remastered/Caroline-Filament-Audio-Remastered-96Khz.m4a)** |
-| GroovyUntightFunk | XM | [listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/rendered/GroovyUntightFunk.m4a) | **[listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/remastered/GroovyUntightFunk-Filament-Audio-Remastered-96Khz.m4a)** |
-| jt_mind | XM | [listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/rendered/jt_mind.m4a) | **[listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/remastered/jt_mind-Filament-Audio-Remastered-96Khz.m4a)** |
-| jt_pools | XM | [listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/rendered/jt_pools.m4a) | **[listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/remastered/jt_pools-Filament-Audio-Remastered-96Khz.m4a)** |
-| sweetdre | XM | [listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/rendered/sweetdre.m4a) | **[listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/remastered/sweetdre-Filament-Audio-Remastered-96Khz.m4a)** |
-| tiny_tunes | MOD | [listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/rendered/tiny_tunes.m4a) | **[listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/remastered/tiny_tunes-Filament-Audio-Remastered-96Khz.m4a)** |
-| znm-wopeace | IT | [listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/rendered/znm-wopeace.m4a) | **[listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/remastered/znm-wopeace-Filament-Audio-Remastered-96Khz.m4a)** |
+| 2ND_PM | S3M | [listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/rendered/2ND_PM.mp3) | **[listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/remastered/2ND_PM-Filament-Audio-Remastered-96Khz.mp3)** |
+| 4mat_-_eternity | XM | [listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/rendered/4mat_-_eternity.mp3) | **[listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/remastered/4mat_-_eternity-Filament-Audio-Remastered-96Khz.mp3)** |
+| beyond_the_network | IT | [listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/rendered/beyond_the_network.mp3) | **[listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/remastered/beyond_the_network-Filament-Audio-Remastered-96Khz.mp3)** |
+| Caroline | XM | [listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/rendered/Caroline.mp3) | **[listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/remastered/Caroline-Filament-Audio-Remastered-96Khz.mp3)** |
+| GroovyUntightFunk | XM | [listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/rendered/GroovyUntightFunk.mp3) | **[listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/remastered/GroovyUntightFunk-Filament-Audio-Remastered-96Khz.mp3)** |
+| jt_mind | XM | [listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/rendered/jt_mind.mp3) | **[listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/remastered/jt_mind-Filament-Audio-Remastered-96Khz.mp3)** |
+| jt_pools | XM | [listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/rendered/jt_pools.mp3) | **[listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/remastered/jt_pools-Filament-Audio-Remastered-96Khz.mp3)** |
+| sweetdre | XM | [listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/rendered/sweetdre.mp3) | **[listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/remastered/sweetdre-Filament-Audio-Remastered-96Khz.mp3)** |
+| tiny_tunes | MOD | [listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/rendered/tiny_tunes.mp3) | **[listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/remastered/tiny_tunes-Filament-Audio-Remastered-96Khz.mp3)** |
+| znm-wopeace | IT | [listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/rendered/znm-wopeace.mp3) | **[listen](https://github.com/Kind-Computers/filament-audio/raw/main/mods/remastered/znm-wopeace-Filament-Audio-Remastered-96Khz.mp3)** |
 
 Want the full 96 kHz originals? Download
 [filament-audio-96khz-bundle.zip](https://github.com/Kind-Computers/filament-audio/releases/download/audio-bundle-v1/filament-audio-96khz-bundle.zip)
