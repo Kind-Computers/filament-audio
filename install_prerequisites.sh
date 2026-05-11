@@ -34,6 +34,17 @@ sudo apt install -y pipewire-alsa "$VENV_PKG" \
   libpango1.0-dev libglib2.0-dev libgdk-pixbuf-2.0-dev libatk1.0-dev libcairo2-dev \
   libavcodec-dev libavformat-dev libavutil-dev libswresample-dev libswscale-dev
 
+# If the existing venv's bin/python is a different minor version than $PY, the
+# venv module won't replace the binary — pip ends up installing under a new
+# lib/python3.X/site-packages while bin/python still points at the old one, so
+# nothing imports. Recreate from scratch in that case.
+if [ -d "$VENV" ]; then
+  EXISTING_MINOR=$("$VENV/bin/python" -c 'import sys; print(sys.version_info.minor)' 2>/dev/null || true)
+  if [ "$EXISTING_MINOR" != "$CAND_MINOR" ]; then
+    echo "Existing venv uses python3.${EXISTING_MINOR:-?}; recreating with $PY"
+    rm -rf "$VENV"
+  fi
+fi
 $PY -m venv "$VENV"
 "$VENV/bin/pip" install --upgrade pip setuptools==70.2.0
 
